@@ -1,162 +1,94 @@
-const Review = require("../models/Review");
-const Book = require("../models/Book");
-const paginate = require("../utils/paginate");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-// Helper function to update book's average rating
-const updateBookAverageRating = async (bookId) => {
-  const stats = await Review.aggregate([
-    { $match: { book: bookId } },
-    {
-      $group: {
-        _id: "$book",
-        averageRating: { $avg: "$rating" },
-        totalReviews: { $sum: 1 },
-      },
-    },
-  ]);
-
-  if (stats.length > 0) {
-    await Book.findByIdAndUpdate(bookId, {
-      averageRating: Math.round(stats[0].averageRating * 10) / 10,
-      totalReviews: stats[0].totalReviews,
-    });
-  } else {
-    await Book.findByIdAndUpdate(bookId, {
-      averageRating: 0,
-      totalReviews: 0,
-    });
-  }
+const generateToken = (userId) => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
 };
 
-exports.getAllReviews = async (req, res, next) => {
+exports.register = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const reviews = Review.find()
-      .populate("user", "username")
-      .populate("book", "title author");
+    const { username, email, password } = req.body;
 
-    const result = await paginate(reviews, { page, limit });
-    res.json({
-      success: true,
-      ...result,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.createReview = async (req, res, next) => {
-  try {
-    const { book: bookId } = req.body;
-
-    // Check if user has already reviewed this book
-    const existingReview = await Review.findOne({
-      user: req.user._id,
-      book: bookId,
-    });
-
-    if (existingReview) {
+    // Check if user already exists
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
       return res.status(400).json({
-        success: false,
-        message: "You have already reviewed this book",
+        message: "User already exists with this email or username",
       });
     }
 
-    // Create review
-    const review = await Review.create({
-      ...req.body,
-      user: req.user._id,
-    });
+    // Create new user
+    const user = await User.create({ username, email, password });
 
-    // Update book's average rating
-    await updateBookAverageRating(bookId);
+    // Generate token
+    const token = generateToken(user._id);
 
-    await review.populate("user", "username");
-    await review.populate("book", "title author");
-
+    // Send response
     res.status(201).json({
       success: true,
-      data: review,
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
     });
   } catch (error) {
     next(error);
   }
 };
 
-exports.getReview = async (req, res, next) => {
+exports.login = async (req, res, next) => {
   try {
-    const review = await Review.findById(req.params.id)
-      .populate("user", "username")
-      .populate("book", "title author");
+    const { email, password } = req.body;
 
-    if (!review) {
-      return res.status(404).json({
-        success: false,
-        message: "Review not found",
+    // Check if email and password are provided
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Please provide email and password",
       });
     }
 
+    // Find user
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({
+        message: "Invalid credentials",
+      });
+    }
+
+    // Generate token
+    const token = generateToken(user._id);
+
+    // Send response
     res.json({
       success: true,
-      data: review,
+      token,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
     });
   } catch (error) {
     next(error);
   }
 };
 
-exports.updateReview = async (req, res, next) => {
+// Get current user profile
+exports.getMe = async (req, res, next) => {
   try {
-    const review = await Review.findOneAndUpdate(
-      { _id: req.params.id, user: req.user._id },
-      req.body,
-      { new: true, runValidators: true }
-    )
-      .populate("user", "username")
-      .populate("book", "title author");
-
-    if (!review) {
-      return res.status(404).json({
-        success: false,
-        message: "Review not found or not authorized",
-      });
-    }
-
-    // Update book's average rating
-    await updateBookAverageRating(review.book);
-
+    const user = await User.findById(req.user._id);
     res.json({
       success: true,
-      data: review,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-exports.deleteReview = async (req, res, next) => {
-  try {
-    const review = await Review.findOne({
-      _id: req.params.id,
-      user: req.user._id,
-    });
-
-    if (!review) {
-      return res.status(404).json({
-        success: false,
-        message: "Review not found or not authorized",
-      });
-    }
-
-    const bookId = review.book;
-    await review.remove();
-
-    // Update book's average rating
-    await updateBookAverageRating(bookId);
-
-    res.status(204).json({
-      success: true,
-      data: {},
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
     });
   } catch (error) {
     next(error);
