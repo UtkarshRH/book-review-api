@@ -15,8 +15,5 @@ COPY . .
 # Expose port
 EXPOSE 3000
 
-# Start command
-CMD ["node", "src/server.js"]
-
 # Start the application
 CMD ["node", "src/server.js"]
