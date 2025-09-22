@@ -1,23 +1,22 @@
-FROM node:16-alpine
+FROM node:16
 
 # Create app directory
 WORKDIR /app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
+# Copy package files
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm install
 
 # Bundle app source
 COPY . .
 
-# Your app binds to port 3000 so you'll use the EXPOSE instruction to have it mapped by the docker daemon
+# Expose port
 EXPOSE 3000
 
-# Set NODE_ENV
-ENV NODE_ENV=production
+# Start command
+CMD ["node", "src/server.js"]
 
 # Start the application
 CMD ["node", "src/server.js"]

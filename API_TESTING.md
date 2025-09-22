@@ -4,8 +4,9 @@ This guide provides examples of how to test all endpoints of the Book Review API
 
 Base URL: `http://localhost:3000` (for local testing)
 
-once deployed will change local to deployed one : TODO
-Base URL: `http://localhost:3000` 
+Deployed:
+
+Base URL: `https://book-review-api-dwec.onrender.com` 
 
 ## Authentication Endpoints
 
