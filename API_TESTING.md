@@ -6,14 +6,14 @@ Base URL: `http://localhost:3000` (for local testing)
 
 Deployed:
 
-Base URL: `https://book-review-api-dwec.onrender.com` 
+Base URL: `https://book-review-api-dwec.onrender.com`
 
 ## Authentication Endpoints
 
 ### 1. Register a New User (Signup)
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/register \
+curl -X POST https://book-review-api-dwec.onrender.com/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "testuser",
@@ -39,7 +39,7 @@ Expected Response:
 ### 2. Login
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/login \
+curl -X POST https://book-review-api-dwec.onrender.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -66,7 +66,7 @@ Expected Response:
 ### 1. Add a New Book (Authenticated)
 
 ```bash
-curl -X POST http://localhost:3000/api/books \
+curl -X POST https://book-review-api-dwec.onrender.com/api/books \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_jwt_token" \
   -d '{
@@ -99,13 +99,13 @@ Expected Response:
 
 ```bash
 # Basic pagination
-curl "http://localhost:3000/api/books?page=1&limit=10"
+curl "https://book-review-api-dwec.onrender.com/api/books?page=1&limit=10"
 
 # With author filter
-curl "http://localhost:3000/api/books?author=Fitzgerald&page=1&limit=10"
+curl "https://book-review-api-dwec.onrender.com/api/books?author=Fitzgerald&page=1&limit=10"
 
 # With genre filter
-curl "http://localhost:3000/api/books?genre=Fiction&page=1&limit=10"
+curl "https://book-review-api-dwec.onrender.com/api/books?genre=Fiction&page=1&limit=10"
 ```
 
 Expected Response:
@@ -128,7 +128,7 @@ Expected Response:
 ### 3. Get Book Details by ID
 
 ```bash
-curl http://localhost:3000/api/books/book_id
+curl https://book-review-api-dwec.onrender.com/api/books/book_id
 ```
 
 Expected Response:
@@ -163,10 +163,10 @@ Expected Response:
 
 ```bash
 # Search by title
-curl "http://localhost:3000/api/search?query=gatsby"
+curl "https://book-review-api-dwec.onrender.com/api/search?query=gatsby"
 
 # Search by author
-curl "http://localhost:3000/api/search?query=fitzgerald"
+curl "https://book-review-api-dwec.onrender.com/api/search?query=fitzgerald"
 ```
 
 Expected Response:
@@ -191,7 +191,7 @@ Expected Response:
 ### 1. Submit a Review (Authenticated)
 
 ```bash
-curl -X POST http://localhost:3000/api/books/book_id/reviews \
+curl -X POST https://book-review-api-dwec.onrender.com/api/books/book_id/reviews \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_jwt_token" \
   -d '{
@@ -219,7 +219,7 @@ Expected Response:
 ### 2. Update a Review (Authenticated)
 
 ```bash
-curl -X PUT http://localhost:3000/api/reviews/review_id \
+curl -X PUT https://book-review-api-dwec.onrender.com/api/reviews/review_id \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer your_jwt_token" \
   -d '{
@@ -247,7 +247,7 @@ Expected Response:
 ### 3. Delete a Review (Authenticated)
 
 ```bash
-curl -X DELETE http://localhost:3000/api/reviews/review_id \
+curl -X DELETE https://book-review-api-dwec.onrender.com/api/reviews/review_id \
   -H "Authorization: Bearer your_jwt_token"
 ```
 
@@ -302,7 +302,7 @@ Expected Response:
 
 1. Import the following cURL commands into Postman
 2. Create an environment in Postman with variables:
-   - `baseUrl`: http://localhost:3000
+   - `baseUrl`: https://book-review-api-dwec.onrender.com
    - `token`: (to be set after login)
 3. After successful login, set the `token` environment variable with the received JWT token
 4. Use the environment variables in your requests:
