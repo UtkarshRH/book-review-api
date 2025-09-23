@@ -72,28 +72,40 @@ exports.createBook = async (req, res, next) => {
 exports.getBook = async (req, res, next) => {
   try {
     const { page = 1, limit = 10 } = req.query;
+    
+    // Get book details
     const book = await Book.findById(req.params.id);
 
     if (!book) {
       return res.status(404).json({
-        success: false,
-        message: "Book not found",
+        status: 'error',
+        message: "Book not found"
       });
     }
 
     // Get paginated reviews for this book
-    const reviews = Review.find({ book: req.params.id }).populate(
-      "user",
-      "username"
+    const reviewsResult = await paginate(
+      Review,
+      { book: req.params.id },
+      { page, limit }
     );
-    const paginatedReviews = await paginate(reviews, { page, limit });
+
+    // If there are reviews, populate the user information
+    if (reviewsResult.data.length > 0) {
+      await Review.populate(reviewsResult.data, {
+        path: 'user',
+        select: 'username'
+      });
+    }
 
     res.json({
-      success: true,
+      status: 'success',
       data: {
-        ...book.toObject(),
-        reviews: paginatedReviews,
-      },
+        book: {
+          ...book.toObject(),
+          reviews: reviewsResult
+        }
+      }
     });
   } catch (error) {
     next(error);
