@@ -107,6 +107,12 @@ User (1) <--- (many) Review (many) ---> (1) Book
          +----------------------+
 ```
 
+## Deployment
+
+This API is currently deployed and live at: **https://book-review-api-dwec.onrender.com**
+
+You can test all endpoints directly using this URL without needing to run the server locally.
+
 ## Prerequisites
 
 - Node.js (v14 or higher)
