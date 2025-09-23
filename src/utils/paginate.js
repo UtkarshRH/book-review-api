@@ -1,22 +1,35 @@
-module.exports = async (query, options = {}) => {
-  const page = parseInt(options.page, 10) || 1;
-  const limit = parseInt(options.limit, 10) || 10;
-  const startIndex = (page - 1) * limit;
+module.exports = async (Model, query = {}, options = {}) => {
+    const page = parseInt(options.page, 10) || 1;
+    const limit = parseInt(options.limit, 10) || 10;
+    const startIndex = (page - 1) * limit;
 
-  const results = {};
-  results.total = await query.countDocuments().exec();
-  results.pages = Math.ceil(results.total / limit);
+    try {
+        const [total, data] = await Promise.all([
+            Model.countDocuments(query),
+            Model.find(query).skip(startIndex).limit(limit)
+        ]);
 
-  if (startIndex > 0) {
-    results.previous = page - 1;
-  }
+        const results = {
+            status: 'success',
+            data,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(total / limit),
+                totalItems: total,
+                limit: limit
+            }
+        };
 
-  if (startIndex + limit < results.total) {
-    results.next = page + 1;
-  }
+        if (startIndex > 0) {
+            results.pagination.previousPage = page - 1;
+        }
 
-  results.data = await query.skip(startIndex).limit(limit).exec();
-  results.currentPage = page;
+        if (startIndex + limit < total) {
+            results.pagination.nextPage = page + 1;
+        }
 
-  return results;
+        return results;
+    } catch (error) {
+        throw error;
+    }
 };

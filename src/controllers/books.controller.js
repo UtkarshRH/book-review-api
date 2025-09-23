@@ -16,12 +16,8 @@ exports.getAllBooks = async (req, res, next) => {
       query.genre = { $in: Array.isArray(genre) ? genre : [genre] };
     }
 
-    const books = Book.find(query);
-    const result = await paginate(books, { page, limit });
-    res.json({
-      success: true,
-      ...result,
-    });
+    const result = await paginate(Book, query, { page, limit });
+    res.json(result);
   } catch (error) {
     next(error);
   }
