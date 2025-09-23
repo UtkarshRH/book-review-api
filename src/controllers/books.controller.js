@@ -27,11 +27,11 @@ exports.getAllBooks = async (req, res, next) => {
 exports.searchBooks = async (req, res, next) => {
   try {
     const { q, page = 1, limit = 10 } = req.query;
-    
+
     if (!q) {
       return res.status(400).json({
-        status: 'error',
-        message: "Please provide a search query using the 'q' parameter"
+        status: "error",
+        message: "Please provide a search query using the 'q' parameter",
       });
     }
 
@@ -39,15 +39,15 @@ exports.searchBooks = async (req, res, next) => {
       $or: [
         { title: { $regex: q, $options: "i" } },
         { author: { $regex: q, $options: "i" } },
-      ]
+      ],
     };
 
     const result = await paginate(Book, query, { page, limit });
 
     res.json({
-      status: 'success',
+      status: "success",
       data: result.data,
-      pagination: result.pagination
+      pagination: result.pagination,
     });
   } catch (error) {
     next(error);
@@ -75,14 +75,14 @@ exports.createBook = async (req, res, next) => {
 exports.getBook = async (req, res, next) => {
   try {
     const { page = 1, limit = 10 } = req.query;
-    
+
     // Get book details
     const book = await Book.findById(req.params.id);
 
     if (!book) {
       return res.status(404).json({
-        status: 'error',
-        message: "Book not found"
+        status: "error",
+        message: "Book not found",
       });
     }
 
@@ -96,19 +96,19 @@ exports.getBook = async (req, res, next) => {
     // If there are reviews, populate the user information
     if (reviewsResult.data.length > 0) {
       await Review.populate(reviewsResult.data, {
-        path: 'user',
-        select: 'username'
+        path: "user",
+        select: "username",
       });
     }
 
     res.json({
-      status: 'success',
+      status: "success",
       data: {
         book: {
           ...book.toObject(),
-          reviews: reviewsResult
-        }
-      }
+          reviews: reviewsResult,
+        },
+      },
     });
   } catch (error) {
     next(error);

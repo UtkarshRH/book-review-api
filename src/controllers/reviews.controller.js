@@ -75,20 +75,20 @@ exports.createReview = async (req, res, next) => {
     if (!book) {
       return res.status(404).json({
         status: "error",
-        message: "Book not found"
+        message: "Book not found",
       });
     }
 
     // Check if user has already reviewed this book
     const existingReview = await Review.findOne({
       user: req.user._id,
-      book: bookId
+      book: bookId,
     });
 
     if (existingReview) {
       return res.status(400).json({
         status: "error",
-        message: "You have already reviewed this book"
+        message: "You have already reviewed this book",
       });
     }
 
@@ -97,7 +97,7 @@ exports.createReview = async (req, res, next) => {
       book: bookId,
       user: req.user._id,
       rating,
-      comment
+      comment,
     });
 
     // Populate user and book information
@@ -174,7 +174,7 @@ exports.updateReview = async (req, res, next) => {
 
 exports.deleteReview = async (req, res, next) => {
   try {
-    const review = await Review.findOne({
+    const review = await Review.findOneAndDelete({
       _id: req.params.id,
       user: req.user._id,
     });
@@ -187,14 +187,13 @@ exports.deleteReview = async (req, res, next) => {
     }
 
     const bookId = review.book;
-    await review.remove();
 
     // Update book's average rating
     await updateBookAverageRating(bookId);
 
-    res.status(204).json({
-      success: true,
-      data: {},
+    res.status(200).json({
+      status: "success",
+      message: "Review deleted successfully",
     });
   } catch (error) {
     next(error);
