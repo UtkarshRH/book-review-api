@@ -67,17 +67,28 @@ exports.getAllReviews = async (req, res, next) => {
 // Create a new review
 exports.createReview = async (req, res, next) => {
   try {
-    const { bookId, rating, comment } = req.body;
+    const { rating, comment } = req.body;
+    const bookId = req.params.id; // Get book ID from URL params
 
+    // First check if the book exists
+    const book = await Book.findById(bookId);
+    if (!book) {
+      return res.status(404).json({
+        status: "error",
+        message: "Book not found"
+      });
+    }
+
+    // Check if user has already reviewed this book
     const existingReview = await Review.findOne({
       user: req.user._id,
-      book: bookId,
+      book: bookId
     });
 
     if (existingReview) {
       return res.status(400).json({
         status: "error",
-        message: "You have already reviewed this book",
+        message: "You have already reviewed this book"
       });
     }
 
@@ -86,7 +97,7 @@ exports.createReview = async (req, res, next) => {
       book: bookId,
       user: req.user._id,
       rating,
-      comment,
+      comment
     });
 
     // Populate user and book information

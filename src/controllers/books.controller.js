@@ -26,25 +26,28 @@ exports.getAllBooks = async (req, res, next) => {
 // Search books by title or author
 exports.searchBooks = async (req, res, next) => {
   try {
-    const { q } = req.query;
+    const { q, page = 1, limit = 10 } = req.query;
+    
     if (!q) {
       return res.status(400).json({
-        success: false,
-        message: "Please provide a search query",
+        status: 'error',
+        message: "Please provide a search query using the 'q' parameter"
       });
     }
 
-    const books = await Book.find({
+    const query = {
       $or: [
         { title: { $regex: q, $options: "i" } },
         { author: { $regex: q, $options: "i" } },
-      ],
-    }).limit(10);
+      ]
+    };
+
+    const result = await paginate(Book, query, { page, limit });
 
     res.json({
-      success: true,
-      count: books.length,
-      data: books,
+      status: 'success',
+      data: result.data,
+      pagination: result.pagination
     });
   } catch (error) {
     next(error);
