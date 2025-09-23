@@ -43,6 +43,37 @@ book-review-api/
 └── README.md             # Project documentation
 ```
 
+## Database Schema
+
+The API uses MongoDB with the following main collections:
+
+### User Collection
+- `username`: String (required, unique)
+- `email`: String (required, unique)
+- `password`: String (required, hashed)
+- `createdAt`: Date
+- `updatedAt`: Date
+
+### Book Collection
+- `title`: String (required, indexed for search)
+- `author`: String (required, indexed for search)
+- `description`: String (required)
+- `publishedYear`: Number
+- `isbn`: String (unique)
+- `genre`: Array of Strings (indexed for filtering)
+- `averageRating`: Number (default: 0, range: 0-5)
+- `totalReviews`: Number (default: 0)
+- `createdAt`: Date
+- `updatedAt`: Date
+
+### Review Collection
+- `book`: ObjectId (reference to Book, required)
+- `user`: ObjectId (reference to User, required)
+- `rating`: Number (required, range: 1-5)
+- `comment`: String (required)
+- `createdAt`: Date
+- `updatedAt`: Date
+
 ## Prerequisites
 
 - Node.js (v14 or higher)
