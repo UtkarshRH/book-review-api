@@ -1,12 +1,12 @@
 # API Testing Guide
 
-This guide provides examples of how to test all endpoints of the Book Review API using both cURL commands and Postman.
+This guide provides examples of how to test all endpoints of the Book Review API using both cURL commands and Postman. It includes detailed explanations for each endpoint, expected responses, and common error scenarios.
 
-Base URL: `http://localhost:3000` (for local testing)
+## Base URLs
+- **Local Testing**: `http://localhost:3000`
+- **Deployed**: `https://book-review-api-dwec.onrender.com`
 
-Deployed:
-
-Base URL: `https://book-review-api-dwec.onrender.com`
+**Note**: Replace the base URL in the cURL commands with the appropriate one for your testing environment. For local testing, use `http://localhost:3000`. For production testing, use `https://book-review-api-dwec.onrender.com`.
 
 ## Authentication Endpoints
 
