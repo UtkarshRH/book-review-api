@@ -74,6 +74,39 @@ The API uses MongoDB with the following main collections:
 - `createdAt`: Date
 - `updatedAt`: Date
 
+## Entity Relationship Diagram
+
+Below is a textual representation of the ER diagram for the database schema:
+
+```
+User (1) <--- (many) Review (many) ---> (1) Book
+```
+
+### Detailed Relationships:
+- **User** to **Review**: One-to-Many (A user can write multiple reviews)
+- **Book** to **Review**: One-to-Many (A book can have multiple reviews)
+- **Review** to **User**: Many-to-One (Each review belongs to one user)
+- **Review** to **Book**: Many-to-One (Each review is for one book)
+
+### ASCII Diagram:
+```
++----------------+       +----------------+       +----------------+
+|     User       |       |    Review      |       |     Book       |
++----------------+       +----------------+       +----------------+
+| - username     |       | - rating       |       | - title        |
+| - email        |       | - comment      |       | - author       |
+| - password     |       | - createdAt    |       | - description  |
+| - createdAt    |       | - updatedAt    |       | - publishedYear|
+| - updatedAt    |       +----------------+       | - averageRating|
++----------------+              |                | - totalReviews |
+         |                      |                | - createdAt    |
+         |                      |                | - updatedAt    |
+         |                      |                +----------------+
+         |                      |
+         |                      |
+         +----------------------+
+```
+
 ## Prerequisites
 
 - Node.js (v14 or higher)
